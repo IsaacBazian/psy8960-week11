@@ -33,7 +33,7 @@ gss_train_tbl <- gss_shuffled_tbl[1:split75,]
 gss_test_tbl <- gss_shuffled_tbl[(split75 + 1):nrow(gss_shuffled_tbl),]
 training_folds <- createFolds(gss_train_tbl$workhours, 10)
 
-
+tic() #These calls of tic and toc record the runtime of each model train
 modelOLS <- train(
   workhours ~ .,
   gss_train_tbl,
@@ -43,8 +43,9 @@ modelOLS <- train(
   preProcess = "medianImpute",
   trControl = trainControl(method="cv", indexOut = training_folds, number = 10, search = "grid", verboseIter=T)
 )
+tocOLS <- toc() #Runtime of each model assigned to an object like this for later Publication section
 
-
+tic()
 modelElasticNet <- train(
   workhours ~ .,
   gss_train_tbl,
@@ -54,8 +55,9 @@ modelElasticNet <- train(
   preProcess = "medianImpute",
   trControl = trainControl(method="cv", indexOut = training_folds, number = 10, search = "grid", verboseIter=T)
 )
+tocElasticNet <- toc()
 
-
+tic()
 modelRandomForest <- train(
   workhours ~ .,
   gss_train_tbl,
@@ -67,8 +69,9 @@ modelRandomForest <- train(
   tuneLength = 3
   #tuneGrid = expand.grid(mtry = c(2, 10, 50, 100, 200), splitrule = c("variance", "extratrees"), min.node.size = 5) #This seems to run a little faster. Commented out, as just letting tuneLength run wasn't that bad in the end
 )
+tocRandomForest <- toc()
 
-
+tic()
 modelXGB <- train(
   workhours ~ .,
   gss_train_tbl,
@@ -79,7 +82,7 @@ modelXGB <- train(
   trControl = trainControl(method="cv", indexOut = training_folds, number = 10, search = "grid", verboseIter=T),
   tuneLength = 3
 )
-
+tocXGB <- toc()
 
 ## Publication
 table1_tbl <- tibble(
@@ -102,7 +105,7 @@ table1_tbl <- tibble(
 
 Table2_tbl <- tibble(
   algo = c("OLS Regression", "Elastic Net", "Random Forest", "eXtreme Gradient Boosting"),
-  original = c("", "", "", ""),
+  original = c(tocOLS$callback_msg, tocElasticNet$callback_msg, tocRandomForest$callback_msg, tocXGB$callback_msg),
   parallelized = c("", "", "", "")
 )
 
