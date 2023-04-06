@@ -67,7 +67,6 @@ modelRandomForest <- train(
   preProcess = "medianImpute",
   trControl = trainControl(method="cv", indexOut = training_folds, number = 10, search = "grid", verboseIter=T),
   tuneLength = 3
-  #tuneGrid = expand.grid(mtry = c(2, 10, 50, 100, 200), splitrule = c("variance", "extratrees"), min.node.size = 5) #This seems to run a little faster. Commented out, as just letting tuneLength run wasn't that bad in the end
 )
 tocRandomForest <- toc()
 
@@ -83,6 +82,72 @@ modelXGB <- train(
   tuneLength = 3
 )
 tocXGB <- toc()
+
+
+
+
+
+# The following code sets up parallelization, runs the same models again, and times them
+local_cluster <- makeCluster(7)
+registerDoParallel(local_cluster)
+
+tic()
+modelOLSPar <- train(
+  workhours ~ .,
+  gss_train_tbl,
+  method = "lm",
+  metric = "Rsquared",
+  na.action = na.pass,
+  preProcess = "medianImpute",
+  trControl = trainControl(method="cv", indexOut = training_folds, number = 10, search = "grid", verboseIter=T)
+)
+tocOLSPar <- toc()
+
+tic()
+modelElasticNetPar <- train(
+  workhours ~ .,
+  gss_train_tbl,
+  method = "glmnet",
+  metric = "Rsquared",
+  na.action = na.pass,
+  preProcess = "medianImpute",
+  trControl = trainControl(method="cv", indexOut = training_folds, number = 10, search = "grid", verboseIter=T)
+)
+tocElasticNetPar <- toc()
+
+tic()
+modelRandomForestPar <- train(
+  workhours ~ .,
+  gss_train_tbl,
+  method = "ranger",
+  metric = "Rsquared",
+  na.action = na.pass,
+  preProcess = "medianImpute",
+  trControl = trainControl(method="cv", indexOut = training_folds, number = 10, search = "grid", verboseIter=T),
+  tuneLength = 3
+)
+tocRandomForestPar <- toc()
+
+tic()
+modelXGBPar <- train(
+  workhours ~ .,
+  gss_train_tbl,
+  method = "xgbLinear",
+  metric = "Rsquared",
+  na.action = na.pass,
+  preProcess = "medianImpute",
+  trControl = trainControl(method="cv", indexOut = training_folds, number = 10, search = "grid", verboseIter=T),
+  tuneLength = 3
+)
+tocXGBPar <- toc()
+
+
+#Stop parallelization
+stopCluster(local_cluster)
+registerDoSEQ()
+
+
+
 
 ## Publication
 table1_tbl <- tibble(
@@ -106,7 +171,7 @@ table1_tbl <- tibble(
 Table2_tbl <- tibble(
   algo = c("OLS Regression", "Elastic Net", "Random Forest", "eXtreme Gradient Boosting"),
   original = c(tocOLS$callback_msg, tocElasticNet$callback_msg, tocRandomForest$callback_msg, tocXGB$callback_msg),
-  parallelized = c("", "", "", "")
+  parallelized = c(tocOLSPar$callback_msg, tocElasticNetPar$callback_msg, tocRandomForestPar$callback_msg, tocXGBPar$callback_msg)
 )
 
 
