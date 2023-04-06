@@ -8,14 +8,15 @@ set.seed(2112)
 
 ## Data Import and Cleaning
 gss_tbl_original <- read_sav(file = "../data/GSS2016.sav") %>% 
-  filter(!is.na(HRS1))
+  filter(!is.na(MOSTHRS)) %>% 
+  select(-HRS1, -HRS2) #This code drops the HRS1 and HRS2 variables, so we do not predict workhours from work hours
 
 missing_75 <- colMeans(is.na(gss_tbl_original)) >= .75
 
 gss_tbl <- gss_tbl_original[,!missing_75] %>% 
   sapply(as.numeric) %>% 
   as_tibble() %>% 
-  rename(workhours = HRS1)
+  rename(workhours = MOSTHRS)
 
 ## Visualization
 ggplot(gss_tbl, aes(x = workhours)) +
