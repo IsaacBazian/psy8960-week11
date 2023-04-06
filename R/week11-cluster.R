@@ -21,11 +21,6 @@ gss_tbl <- gss_tbl_original[,!missing_75] %>%
   as_tibble() %>% 
   rename(workhours = MOSTHRS)
 
-## Visualization
-ggplot(gss_tbl, aes(x = workhours)) +
-  geom_histogram() +
-  labs(x = "Number of Hours Worked Last Week", y = "Number of Respondents")
-
 ## Analysis
 gss_shuffled_tbl <- gss_tbl[sample(nrow(gss_tbl)),]
 split75 <- round(nrow(gss_shuffled_tbl) * .75)
@@ -86,7 +81,7 @@ tocXGB <- toc()
 
 
 
-local_cluster <- makeCluster(7)
+local_cluster <- makeCluster(14)
 registerDoParallel(local_cluster)
 
 tic()
@@ -147,7 +142,7 @@ registerDoSEQ()
 
 
 ## Publication
-table1_tbl <- tibble(
+Table3 <- tibble(
   algo = c("OLS Regression", "Elastic Net", "Random Forest", "eXtreme Gradient Boosting"),
   cv_rsq = c(
     str_remove(format(round(modelOLS$results$Rsquared, 2), nsmall = 2), pattern = "^0"),
@@ -161,13 +156,20 @@ table1_tbl <- tibble(
     str_remove(format(round(cor(predict(modelRandomForest, gss_test_tbl, na.action = na.pass), gss_test_tbl$workhours)^2, 2), nsmall = 2), pattern = "^0"),
     str_remove(format(round(cor(predict(modelXGB, gss_test_tbl, na.action = na.pass), gss_test_tbl$workhours)^2, 2), nsmall = 2), pattern = "^0")
   )
-) 
-
-
-table2_tbl <- tibble(
-  algo = c("OLS Regression", "Elastic Net", "Random Forest", "eXtreme Gradient Boosting"),
-  original = c(tocOLS$callback_msg, tocElasticNet$callback_msg, tocRandomForest$callback_msg, tocXGB$callback_msg),
-  parallelized = c(tocOLSPar$callback_msg, tocElasticNetPar$callback_msg, tocRandomForestPar$callback_msg, tocXGBPar$callback_msg)
 )
+
+
+Table4 <- tibble(
+  algo = c("OLS Regression", "Elastic Net", "Random Forest", "eXtreme Gradient Boosting"),
+  supercomputer = c(tocOLS$callback_msg, tocElasticNet$callback_msg, tocRandomForest$callback_msg, tocXGB$callback_msg),
+  "supercomputer-14" = c(tocOLSPar$callback_msg, tocElasticNetPar$callback_msg, tocRandomForestPar$callback_msg, tocXGBPar$callback_msg)
+)
+
+
+#Output tables as csv
+write_csv(Table3, "table3.csv")
+write_csv(Table4, "table4.csv")
+
+
 
 
