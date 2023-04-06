@@ -3,6 +3,9 @@ setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 library(tidyverse)
 library(haven)
 library(caret)
+library(tictoc)
+library(parallel)
+library(doParallel)
 set.seed(2112)
 
 
@@ -94,6 +97,20 @@ table1_tbl <- tibble(
     str_remove(format(round(cor(predict(modelXGB, gss_test_tbl, na.action = na.pass), gss_test_tbl$workhours)^2, 2), nsmall = 2), pattern = "^0")
   )
 ) 
+
+
+
+Table2_tbl <- tibble(
+  algo = c("OLS Regression", "Elastic Net", "Random Forest", "eXtreme Gradient Boosting"),
+  original = c("", "", "", ""),
+  parallelized = c("", "", "", "")
+)
+
+
+
+
+
+
 
 
 
