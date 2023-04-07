@@ -9,7 +9,7 @@ set.seed(2112)
 
 
 ## Data Import and Cleaning
-gss_tbl_original <- read_sav(file = "../data/GSS2016.sav") %>% 
+gss_tbl_original <- read_sav(file = "GSS2016.sav") %>% 
   filter(!is.na(MOSTHRS)) %>% 
   select(-HRS1, -HRS2)
 
