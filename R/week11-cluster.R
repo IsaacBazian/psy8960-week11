@@ -170,5 +170,32 @@ write_csv(Table3, "table3.csv")
 write_csv(Table4, "table4.csv")
 
 
+#Q1: The move to the supercomputer seemed to most benefit the XGB algorithm - while
+#it took much longer non-parallelized on the supercomputer than on my own machine,
+#the move to parallel processing dramatically cut the time down, for the greatest
+#ratio of time reduction going from non-parallel to parallel of all the models. I
+#believe this is because XGB may be the most computationally demanding of the models,
+#and getting a greater number of cores on the supercomputer (I asked for 14, which
+#is twice as many as I ran on my own machine) really helped get through the computation
+#faster.
 
+#Q2: It seems that the more cores you can leverage, the lower your run time will be.
+#On my machine, moving to parallel processing used 7 cores, which did lead to run-time
+#reductions on certain models. Using 14 cores on the supercomputer lead to even bigger
+#run-time reductions, and an additional algo (the random forest) which did not reduce
+#significantly on my own machine with parallel processing did reduce considerably 
+#when parallel processing on the supercomputer.
 
+#Q3: In this case, I would recommend using the supercomputer. I will still prefer
+#using the Random Forest in this case, due to it having the highest ho_rsq (based on
+#both Table 1 and Table 3, showing agreement between both computers), meaning
+#it produces the best prediction of outside data in this case. Now, comparing 
+#between my own machine and the supercomputer, my machine takes roughly 60-70 
+#seconds to train the model using 7 cores (Table 2), and the supercomputer cut that down 
+#to about 22 seconds to train the model using 14 cores (Table 4). This is a large time
+#reduction, and it could be run even faster if more cores than 14 were used - the
+#supercomputer certainly has enough processing power to do it much faster, I
+#just asked for the relatively few 14 to expedite my request's execution. So on the
+#whole, the supercomputer delivers a model that works just as well as when executed
+#on my local machine, but much faster, and with the potential to be even faster
+#if more cores are allocated to the problem.

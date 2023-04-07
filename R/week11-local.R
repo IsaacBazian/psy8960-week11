@@ -180,7 +180,13 @@ table2_tbl <- tibble(
 #space to notice considerable improvement. The Random Forest seemed to not improve
 #much, despite also being a relatively long run time - based on some quick Googling,
 #the 'ranger' method may already be using some kind of processing tricks that
-#make parallelization less relatively impactful, but I will need to double check this.
+#make parallelization less relatively impactful. I have since come back a few times,
+#and on every occassion I find that the parallelized and non-parallelized RF
+#is roughly the same run-time, and in fact sometimes the parallelized is slightly
+#slower. I have also talked to some people using Mac machines, and they get different
+#runtimes across most algos, including better reductions in run-time for the RF.
+#I assume some kind of hardware thing may be going on, and I will not worry about
+#it for now.
 
 #Q2: The fastest parallelized model was the Elastic Net at roughly 1 second, and
 #the slowest was the XGB at roughly 87 seconds, for a differences of roughly 86 seconds.
